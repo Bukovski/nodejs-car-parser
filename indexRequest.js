@@ -46,7 +46,7 @@ function getPage(url) {
 function auctionPage () {
 	const urlRequest = REQUEST_BASE_URL + "LiveAuctionsCalendar";
 	
-	getPage(urlRequest)
+	return getPage(urlRequest)
 		.then($ => {
 			const tableRows = $("#dvListLiveAuctions .table-row.table-row-border")
 			const auctionsCalendar = [];
@@ -60,12 +60,9 @@ function auctionPage () {
 				const auctionLink = tableStatus.find('a').attr("href");
 				const spanCloseTime = tableStatus.find('.data-list__value').text();
 				
-				
-				
 				const withoutSpacesName = removeSpacesHyphens(liTextsName);
 				const splitTextName = withoutSpacesName.split(";")
 				const auctionTime = (splitTextName[ 2 ].length > 5) ? splitTextName[ 2 ].slice(0, -6) : "0"; // 11:30am (CST) => 11:30am
-				console.log(splitTextName, auctionTime)
 				
 				const withoutSpacesCloseTime = removeSpacesHyphens(spanCloseTime);
 				const splitTextCloseTime = withoutSpacesCloseTime.split(";")
@@ -85,10 +82,10 @@ function auctionPage () {
 			
 			return auctionsCalendar
 		})
-		.then(auctionCalendarList => console.log(auctionCalendarList))
-		.catch(err => { throw err });
 }
-// auctionPage();
+// auctionPage()
+// 		.then(auctionCalendarList => console.log(auctionCalendarList))
+// 		.catch(err => { throw err });
 
 const exampleAuctionPage = {
   branch: 'San Diego',
@@ -104,7 +101,7 @@ function saleListPage(url = "") {
 	const urlPathTemplate = REQUEST_BASE_URL + path.join("SalesList", getUrlAuctionData[ 0 ], getUrlAuctionData[ 1 ]);
 	
 		
-	getPage(urlPathTemplate)
+	return getPage(urlPathTemplate)
 		.then($ => {
 			const tableRows = $("#salesListLoader > tbody > tr")
 			const listPageCollection = [];
@@ -138,11 +135,32 @@ function saleListPage(url = "") {
 			
 			return listPageCollection;
 		})
-		.then(saleList => console.log(saleList))
-		.catch(err => { throw err });
 }
 
-saleListPage(exampleAuctionPage.auctionLink)
+// saleListPage(exampleAuctionPage.auctionLink)
+// 		.then(saleList => console.log(saleList))
+// 		.catch(err => { throw err });
+
+
+auctionPage()
+	.then((auctionCalendarList) => {
+		let counter = 0;
+		
+		const res = Promise.all(
+			auctionCalendarList.map((calendar, indexI) => {
+				counter += indexI;
+				
+				return saleListPage(calendar.auctionLink)
+			})
+		)
+		
+		console.log("Количество запросов", counter)
+		
+		return res
+	})
+	.then(console.log)
+	.catch(err => { throw err });
+
 
 
 const exampleSaleListPage = {
@@ -158,17 +176,17 @@ const exampleSaleListPage = {
 function detailsPage(carNumber = "") {
 	const urlPathTemplate = REQUEST_BASE_URL + path.join("vehicledetails", carNumber);
 	
-	getPage(urlPathTemplate)
+	return getPage(urlPathTemplate)
 		.then($ => {
 			const scriptBlock = $("#ProductDetailsVM")
 			const textToObject = parseJsonToObject(scriptBlock.html());
 			
 			return textToObject.VehicleDetailsViewModel.BuyNowInd
 		})
-		.then(saleList => console.log("BuyNowInd :",saleList))
-		.catch(err => { throw err });
 }
 
 // detailsPage(exampleSaleListPage.stockText)
 // detailsPage("38768182")
+// 		.then(saleList => console.log("BuyNowInd :",saleList))
+// 		.catch(err => { throw err });
 

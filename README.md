@@ -1,3 +1,5 @@
 # NodeJS car parser
 
-For start get `npm run start`
+
+* Install all packages  `npm i`
+* For start get `npm run start`
