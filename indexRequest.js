@@ -42,7 +42,18 @@ function getPage(url) {
 }
 
 
-// parse auction page
+/**
+ * parse auction page
+ *
+ * @return {Promise<[{},{}]>}
+ *
+ * @example [{
+  branch: 'San Diego',
+  auctionTime: '11:30am',
+  closeTime: '2d 5h',
+  auctionLink: 'Auctions/BranchListingView.aspx?branchCode=116&aucDate=01252021'
+	}, {}..]
+ */
 function auctionPage () {
 	const urlRequest = REQUEST_BASE_URL + "LiveAuctionsCalendar";
 	
@@ -96,17 +107,28 @@ const exampleAuctionPage = {
 
 /********************************************************/
 
+/**
+ * Parse sale list page
+ *
+ * @param url  string  Auctions/BranchListingView.aspx?branchCode=116&aucDate=01252021
+ * @return {Promise<[{},{}]>}
+ *
+ * @example [{
+		stockText: '29291905',
+		yearText: '2010',
+		vinText: 'JN1AJ0HP5AM******'
+	}, {}...]
+ */
 function saleListPage(url = "") {
 	const getUrlAuctionData = url.match(/[branchCode|aucDate]=(\d{3,})/g, ).map((elem) => elem.substr(2));
 	const urlPathTemplate = REQUEST_BASE_URL + path.join("SalesList", getUrlAuctionData[ 0 ], getUrlAuctionData[ 1 ]);
 	
-		
 	return getPage(urlPathTemplate)
 		.then($ => {
 			const tableRows = $("#salesListLoader > tbody > tr")
 			const listPageCollection = [];
 			
-			tableRows.each((index, tableRow) => {
+			const getDataSalePage = (index, tableRow) => {
 				
 				const stockRow = $(tableRow).find("td:nth-child(4)")
 				const stockText = stockRow.text().trim();
@@ -131,7 +153,9 @@ function saleListPage(url = "") {
 				if (yearText > 2009) {
 					listPageCollection.push(dataTemplate)
 				}
-			})
+			};
+			
+			tableRows.each(getDataSalePage)
 			
 			return listPageCollection;
 		})
@@ -141,28 +165,6 @@ function saleListPage(url = "") {
 // 		.then(saleList => console.log(saleList))
 // 		.catch(err => { throw err });
 
-
-auctionPage()
-	.then((auctionCalendarList) => {
-		let counter = 0;
-		
-		const res = Promise.all(
-			auctionCalendarList.map((calendar, indexI) => {
-				counter += indexI;
-				
-				return saleListPage(calendar.auctionLink)
-			})
-		)
-		
-		console.log("Количество запросов", counter)
-		
-		return res
-	})
-	.then(console.log)
-	.catch(err => { throw err });
-
-
-
 const exampleSaleListPage = {
 	stockText: '29291905',
 	yearText: '2010',
@@ -170,6 +172,8 @@ const exampleSaleListPage = {
 }
 /********************************************************/
 /**
+ * Parse details page
+ *
  * @param carNumber string "38768182"
  * @return  boolean true/false
  */
@@ -189,4 +193,27 @@ function detailsPage(carNumber = "") {
 // detailsPage("38768182")
 // 		.then(saleList => console.log("BuyNowInd :",saleList))
 // 		.catch(err => { throw err });
+
+
+
+
+auctionPage()
+	.then((auctionCalendarList) => {
+		let counter = 0;
+		
+		const res = Promise.all(
+			auctionCalendarList.map((calendar, indexI) => {
+				counter += indexI;
+				
+				return saleListPage(calendar.auctionLink)
+					.catch(err => { throw err });
+			})
+		)
+		
+		console.log("Количество запросов", counter)
+		
+		return res
+	})
+	.then(res => console.info("DONE!"))
+	.catch(err => { throw err });
 
