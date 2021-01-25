@@ -2,8 +2,8 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 
-// logger
-app.use(morgan('dev'));
+app.disable('x-powered-by'); // hide x-powered-by header!
+app.use(morgan('dev')); // logger
 // body parser
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
