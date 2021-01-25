@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-
+// body parser
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -21,6 +21,25 @@ app.use((req, res, next) => {
 	
 	next();
 });
+
+// get error if route not found
+app.use((req, res, next) => {
+	const error = new Error('Not found');
+	error.status = 404;
+	
+	next(error)
+})
+
+// catch all errors and show error message
+app.use((err, req, res, next) => {
+	res.status(err.status || 500);
+	
+	res.json({
+		error: {
+			message: err.message
+		}
+	});
+})
 
 
 app.get('/', (req, res, next) => {
