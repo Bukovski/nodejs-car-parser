@@ -1,6 +1,9 @@
 const express = require('express');
 const app = express();
+const morgan = require('morgan');
 
+// logger
+app.use(morgan('dev'));
 // body parser
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -22,6 +25,27 @@ app.use((req, res, next) => {
 	next();
 });
 
+
+// routers
+app.get('/', (req, res, next) => {
+	res.status(200).json({
+		message: 'GET products',
+	})
+})
+
+app.post('/', (req, res, next) => {
+	const product = {
+		name: req.body.name,
+		price: req.body.price
+	}
+	
+	res.status(200).json({
+		message: 'POST products',
+		createdProduct: product
+	})
+})
+
+
 // get error if route not found
 app.use((req, res, next) => {
 	const error = new Error('Not found');
@@ -39,25 +63,6 @@ app.use((err, req, res, next) => {
 			message: err.message
 		}
 	});
-})
-
-
-app.get('/', (req, res, next) => {
-	res.status(200).json({
-		message: 'GET products',
-	})
-})
-
-app.post('/', (req, res, next) => {
-	const product = {
-		name: req.body.name,
-		price: req.body.price
-	}
-	
-	res.status(200).json({
-		message: 'POST products',
-		createdProduct: product
-	})
 })
 
 
