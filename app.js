@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 
+const productRoutes = require('./api/routes/products');
+
+
 app.disable('x-powered-by'); // hide x-powered-by header!
 app.use(morgan('dev')); // logger
 // body parser
@@ -27,6 +30,9 @@ app.use((req, res, next) => {
 
 
 // routers
+app.use("/products", productRoutes);
+
+
 app.get('/', (req, res, next) => {
 	res.status(200).json({
 		message: 'GET products',

@@ -1,0 +1,30 @@
+GET http://localhost:3000/products/
+
+###
+
+POST http://localhost:3000/products/
+Content-Type: application/json
+
+{
+  "name": "Android phone",
+  "price": 500
+}
+###
+
+GET http://localhost:3000/products/special
+
+###
+
+GET http://localhost:3000/products/33
+
+###
+
+PATCH http://localhost:3000/products/55
+
+###
+
+DELETE http://localhost:3000/products/55
+
+###
+
+
