@@ -1,3 +1,5 @@
+# Product ****************************
+
 GET http://localhost:3000/products/
 
 ###
@@ -27,4 +29,25 @@ DELETE http://localhost:3000/products/55
 
 ###
 
+# Orders ****************************
 
+GET http://localhost:3000/orders/
+
+###
+
+POST http://localhost:3000/orders/
+Content-Type: application/json
+
+{
+  "productId": 55,
+  "quantity": 10
+}
+###
+
+GET http://localhost:3000/orders/33
+
+###
+
+DELETE http://localhost:3000/orders/55
+
+###

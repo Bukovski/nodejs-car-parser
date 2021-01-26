@@ -3,6 +3,7 @@ const app = express();
 const morgan = require('morgan');
 
 const productRoutes = require('./api/routes/products');
+const orderRoutes = require('./api/routes/orders');
 
 
 app.disable('x-powered-by'); // hide x-powered-by header!
@@ -31,6 +32,7 @@ app.use((req, res, next) => {
 
 // routers
 app.use("/products", productRoutes);
+app.use("/orders", orderRoutes);
 
 
 app.get('/', (req, res, next) => {
