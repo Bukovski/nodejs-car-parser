@@ -1,2 +1,3 @@
 node_modules
 morgan.log
+nodemon.json

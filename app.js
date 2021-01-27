@@ -1,12 +1,25 @@
 const path = require('path');
 const fs = require('fs');
-
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
+const mongoose = require("mongoose");
 
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
+
+
+
+mongoose.connect(
+	"mongodb+srv://alessa:" +
+	process.env.MONGO_PASS +
+	"@cluster0.ewap2.mongodb.net/node-rest-shop?retryWrites=true&w=majority",
+	{
+		useNewUrlParser: true,
+		useUnifiedTopology: true
+	}
+);
+mongoose.Promise = global.Promise;
 
 
 app.disable('x-powered-by'); // hide x-powered-by header!
