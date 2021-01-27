@@ -1,3 +1,6 @@
+const path = require('path');
+const fs = require('fs');
+
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
@@ -7,7 +10,17 @@ const orderRoutes = require('./api/routes/orders');
 
 
 app.disable('x-powered-by'); // hide x-powered-by header!
-app.use(morgan('dev')); // logger
+
+if (app.get('env') === 'production') {
+	// set morgan to log file
+	app.use(morgan('common', {
+		skip: (req, res) => res.statusCode < 400,
+		stream: fs.createWriteStream(path.join(__dirname, 'morgan.log'), { flags: 'a' })
+	}));
+} else {
+	app.use(morgan('dev')); // logger
+}
+
 // body parser
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -33,25 +46,6 @@ app.use((req, res, next) => {
 // routers
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
-
-
-app.get('/', (req, res, next) => {
-	res.status(200).json({
-		message: 'GET products',
-	})
-})
-
-app.post('/', (req, res, next) => {
-	const product = {
-		name: req.body.name,
-		price: req.body.price
-	}
-	
-	res.status(200).json({
-		message: 'POST products',
-		createdProduct: product
-	})
-})
 
 
 // get error if route not found
