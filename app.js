@@ -5,7 +5,7 @@ const app = express();
 const morgan = require('morgan');
 
 // import environmental variables from our variables.env file
-require('dotenv').config({ path: path.join(__dirname, 'dev-config.env') });
+require('dotenv').config({ path: path.join(__dirname, 'config.env') });
 require('./api/db/mongoose'); // db connect
 
 const productRoutes = require('./api/routes/products');

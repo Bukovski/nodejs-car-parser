@@ -2,11 +2,11 @@
   "name": "nodejs-car-parser",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "parser": "nodemon ./parser/indexRequest.js",
     "dev": "nodemon server.js",
-    "prod": "NODE_ENV=production nodemon server.js"
+    "prod": "NODE_ENV=production server.js"
   },
   "keywords": [],
   "author": "",
