@@ -6,10 +6,10 @@ const morgan = require('morgan');
 
 // import environmental variables from our variables.env file
 require('dotenv').config({ path: path.join(__dirname, 'config.env') });
-require('./api/db/mongoose'); // db connect
+require('./api/db/mongoose-db'); // db connect
 
-const productRoutes = require('./api/routes/products');
-const orderRoutes = require('./api/routes/orders');
+const productRoutes = require('./api/routes/products-routes');
+const orderRoutes = require('./api/routes/orders-routes');
 
 
 
