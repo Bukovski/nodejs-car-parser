@@ -25,7 +25,9 @@ Runs the app in the development mode. Open http://localhost:3000 to view it in t
 * [express](https://expressjs.com/ru/) - minimal and flexible Node.js web application framework
 * [mongoose](https://mongoosejs.com/) - is a MongoDB object modeling tool designed to work in an asynchronous environment. Mongoose supports both promises and callbacks.
 * [morgan](https://github.com/expressjs/morgan) - HTTP `request logger` middleware for node.js
+* [multer](https://github.com/expressjs/multer) - middleware for handling `multipart/form-data`, which is primarily used for `uploading files`
 * [request](https://github.com/request/request) - to make http calls. It supports HTTPS and follows redirects by default (Used for parsing).
+
 
 ## Routes
 * `/products` products

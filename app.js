@@ -25,9 +25,13 @@ if (app.get('env') === 'production') {
 	app.use(morgan('dev')); // logger
 }
 
+// get static files in "uploads" folder
+app.use('/uploads', express.static('uploads'));
+
 // body parser
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
 
 // CORS
 app.use((req, res, next) => {
