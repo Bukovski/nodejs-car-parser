@@ -10,7 +10,7 @@ require('./api/db/mongoose-db'); // db connect
 
 const productRoutes = require('./api/routes/products-routes');
 const orderRoutes = require('./api/routes/orders-routes');
-
+const userRoutes = require('./api/routes/user-routes');
 
 
 app.disable('x-powered-by'); // hide x-powered-by header!
@@ -54,6 +54,7 @@ app.use((req, res, next) => {
 // routers
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
+app.use("/user", userRoutes);
 
 
 // get error if route not found
