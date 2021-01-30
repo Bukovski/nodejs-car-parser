@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const multer = require('multer');
 
+const checkAuth = require('../middleware/check-auth');
+
 const Product = require('../models/product-model')
 
 
@@ -63,18 +65,19 @@ router.get('/', async (req, res) => {
 
 
 /**
- * @description create a new product
+ * @description create a new product only if set auth header
  * @request {"name": "string", "price": "number", "productImage": "file" }
+ * @header "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV..." login user token
  */
-router.post('/', upload.single('productImage'), async (req, res, next) => {
-	const product = new Product({
-		_id: new mongoose.Types.ObjectId(),
-		name: req.body.name,
-		price: req.body.price,
-		productImage: req.file.path
-	});
-	
+router.post('/', checkAuth, upload.single('productImage'), async (req, res, next) => {
 	try {
+		const product = new Product({
+			_id: new mongoose.Types.ObjectId(),
+			name: req.body.name,
+			price: req.body.price,
+			productImage: req.file.path
+		});
+		
 		await product.save();
 		
 		res.status(200).json({
@@ -118,10 +121,11 @@ router.get("/:productId", async (req, res, next) => {
 
 
 /**
- * @description modify a product by product id
+ * @description modify a product by product id only if set auth header
  * @request { "name": "string" | "price": "number" | "productImage": "file" }
+ * @header "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV..." login user token
  */
-router.patch("/:productId", upload.single('productImage'), async (req, res, next) => {
+router.patch("/:productId", checkAuth, upload.single('productImage'), async (req, res, next) => {
 	const _id = req.params.productId;
 	
 	const updates = Object.keys(req.body)
@@ -151,7 +155,7 @@ router.patch("/:productId", upload.single('productImage'), async (req, res, next
 });
 
 
-router.delete("/:productId", async (req, res, next) => {
+router.delete("/:productId", checkAuth, async (req, res, next) => {
 	const _id = req.params.productId;
 	
 	try {

@@ -2,12 +2,14 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require('mongoose');
 
+const checkAuth = require('../middleware/check-auth');
+
 const Order = require('../models/order-model');
 const Product = require("../models/product-model");
 
 
 
-router.get('/', async (req, res) => {
+router.get('/', checkAuth, async (req, res) => {
 	try {
 		const order = await Order.find()
 			.select("product quantity _id")
@@ -34,15 +36,16 @@ router.get('/', async (req, res) => {
 
 
 /**
- * @description create a new order
+ * @description create a new order only if set auth header
  *
  * productId - a product id for new order
  * quantity - default 1
  *
+ * @header "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV..." login user token
  * @request { "productId": "string" | "quantity": "number" }
  * @example {	"productId": "60056abd4e17ef4e922b40cc", "quantity": 22 }
  */
-router.post('/', async (req, res, next) => {
+router.post('/', checkAuth, async (req, res, next) => {
 	try {
 		const product = await Product.findById(req.body.productId)
 		
@@ -74,7 +77,7 @@ router.post('/', async (req, res, next) => {
 })
 
 
-router.get("/:orderId", async (req, res, next) => {
+router.get("/:orderId", checkAuth, async (req, res, next) => {
 	const _id = req.params.orderId;
 	
 	try {
@@ -96,7 +99,7 @@ router.get("/:orderId", async (req, res, next) => {
 });
 
 
-router.delete("/:orderId", async (req, res, next) => {
+router.delete("/:orderId", checkAuth, async (req, res, next) => {
 	const _id = req.params.orderId;
 	
 	try {
