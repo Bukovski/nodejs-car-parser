@@ -5,7 +5,7 @@ const Product = require("../models/product-model");
 exports.products_get_all = async (req, res) => {
   try {
     const product = await Product.find({})
-      .select("name price _id productImage")
+      .select("name price _id productImage updatedAt createdAt")
     
     const response = {
       count: product.length,
@@ -15,6 +15,8 @@ exports.products_get_all = async (req, res) => {
           name: prod.name,
           price: prod.price,
           productImage: prod.productImage,
+          updatedAt: prod.updatedAt,
+          createdAt: prod.createdAt,
           request: {
             type: "GET",
             url: "http://localhost:3000/products/" + prod._id
@@ -64,7 +66,7 @@ exports.products_get_product = async (req, res, next) => {
   const _id = req.params.productId;
   
   try {
-    const product = await Product.findById(_id).select("name price _id productImage")
+    const product = await Product.findById(_id).select("name price _id productImage updatedAt createdAt")
     
     if (!product) return res.status(404).json({ message: 'No valid entry found for provided ID'})
     

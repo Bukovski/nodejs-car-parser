@@ -7,7 +7,7 @@ const Product = require("../models/product-model");
 exports.orders_get_all = async (req, res) => {
   try {
     const _order = await Order.find()
-      .select("product quantity _id")
+      .select("product quantity _id updatedAt createdAt")
       .populate("product", [ "name", "price" ])
     
     const orderMapFn = order => {
@@ -15,6 +15,8 @@ exports.orders_get_all = async (req, res) => {
         _id: order._id,
         product: order.product,
         quantity: order.quantity,
+        updatedAt: order.updatedAt,
+        createdAt: order.createdAt,
         request: {
           type: "GET",
           url: "http://localhost:3000/orders/" + order._id

@@ -3,8 +3,9 @@ const mongooseDb = require('mongoose')
 
 mongooseDb.connect(process.env.MONGODB_URL,
   {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true
   }
 );
 
