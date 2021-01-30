@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
 const multer = require('multer');
 
 const checkAuth = require('../middleware/check-auth');
-
-const Product = require('../models/product-model')
+const ProductsController = require('../controllers/products-controller');
 
 
 const storage = multer.diskStorage({
@@ -38,147 +36,25 @@ const upload = multer({
 
 /*******************************************/
 
-router.get('/', async (req, res) => {
-	try {
-		const product = await Product.find({})
-			.select("name price _id productImage")
-		
-		res.status(200).json({
-			count: product.length,
-			products: product.map(prod => {
-				return {
-					_id: prod._id,
-					name: prod.name,
-					price: prod.price,
-					productImage: prod.productImage,
-					request: {
-						type: "GET",
-						url: "http://localhost:3000/products/" + prod._id
-					}
-				}
-			})
-		})
-	} catch (err) {
-		res.status(500).json({ error: err })
-	}
-})
-
+router.get("/", ProductsController.products_get_all);
 
 /**
  * @description create a new product only if set auth header
  * @request {"name": "string", "price": "number", "productImage": "file" }
  * @header "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV..." login user token
  */
-router.post('/', checkAuth, upload.single('productImage'), async (req, res, next) => {
-	try {
-		const product = new Product({
-			_id: new mongoose.Types.ObjectId(),
-			name: req.body.name,
-			price: req.body.price,
-			productImage: req.file.path
-		});
-		
-		await product.save();
-		
-		res.status(200).json({
-			message: 'POST products',
-			createdProduct: {
-				_id: product._id,
-				name: product.name,
-				price: product.price,
-				productImage: product.productImage,
-				request: {
-					type: "GET",
-					url: "http://localhost:3000/products/" + product._id
-				}
-			}
-		})
-	} catch (err) {
-		res.status(500).json({ error: err })
-	}
-})
+router.post('/', checkAuth, upload.single('productImage'), ProductsController.products_create_product)
 
-
-router.get("/:productId", async (req, res, next) => {
-	const _id = req.params.productId;
-	
-	try {
-		const product = await Product.findById(_id).select("name price _id productImage")
-		
-		if (!product) return res.status(404).json({ message: 'No valid entry found for provided ID'})
-		
-		res.status(200).json({
-			product: product,
-			request: {
-				type: "GET",
-				url: "http://localhost:3000/products"
-			}
-		})
-	} catch (err) {
-		res.status(500).json({ error: err })
-	}
-});
-
+router.get("/:productId", ProductsController.products_get_product);
 
 /**
  * @description modify a product by product id only if set auth header
  * @request { "name": "string" | "price": "number" | "productImage": "file" }
  * @header "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV..." login user token
  */
-router.patch("/:productId", checkAuth, upload.single('productImage'), async (req, res, next) => {
-	const _id = req.params.productId;
-	
-	const updates = Object.keys(req.body)
-	const allowedUpdates = [ 'name', 'price' ]
-	const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-	
-	if (!isValidOperation) return res.status(400).send({ error: 'Invalid fields for updates!' })
-	
-	if (req.file && req.file.path) { // check file update
-		req.body.productImage = req.file.path;
-	}
-	
-	try {
-		const product = await Product.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
-		if (!product) return res.status(404).json({ error: "Product Id not found" });
-		
-		res.status(200).json({
-			message: "Product updated",
-			request: {
-				type: "GET",
-				url: "http://localhost:3000/products/" + _id
-			}
-		})
-	} catch (err) {
-		res.status(400).json({ error: err })
-	}
-});
+router.patch("/:productId", checkAuth, upload.single('productImage'), ProductsController.products_update_product);
 
-
-router.delete("/:productId", checkAuth, async (req, res, next) => {
-	const _id = req.params.productId;
-	
-	try {
-		const product = await Product.findByIdAndDelete(_id)
-		
-		if (!product) return res.status(404).json({ error: "Product Id not found" });
-		
-		res.status(200).json({
-			message: "Product deleted",
-			request: {
-				type: "POST",
-				url: "http://localhost:3000/products",
-				body: {
-					name: "String",
-					price: "Number"
-				}
-			}
-		})
-	} catch (err) {
-		res.status(500).json({ error: err })
-	}
-});
-
+router.delete("/:productId", checkAuth, ProductsController.products_delete);
 
 
 module.exports = router;
