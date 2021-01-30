@@ -1,6 +1,6 @@
 node_modules
 morgan.log
-dev-config.env
+config.env
 
 /parser
 /parser/*
