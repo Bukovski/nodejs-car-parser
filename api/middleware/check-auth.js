@@ -12,9 +12,11 @@ module.exports = async (req, res, next) => {
         if (!user) {
             return res.status(401).json({ message: 'User not found' });
         }
+        
+        delete user.password;
     
         req.token = token
-        req.authUserInfo = decoded
+        req.authUserInfo = user
         
         next();
     } catch (error) { // if token is not real or its lifetime (1 hour) has expired

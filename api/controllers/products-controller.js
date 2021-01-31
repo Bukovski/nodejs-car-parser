@@ -27,7 +27,7 @@ exports.products_get_all = async (req, res) => {
     
     res.status(200).json(response);
   } catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err.message })
   }
 };
 
@@ -58,7 +58,7 @@ exports.products_create_product = async (req, res, next) => {
     
     res.status(200).json(response);
   } catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err.message })
   }
 };
 
@@ -80,7 +80,7 @@ exports.products_get_product = async (req, res, next) => {
     
     res.status(200).json(response);
   } catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err.message })
   }
 };
 
@@ -111,7 +111,7 @@ exports.products_update_product = async (req, res, next) => {
     
     res.status(200).json(response);
   } catch (err) {
-    res.status(400).json({ error: err })
+    res.status(400).json({ error: err.message })
   }
 };
 
@@ -135,6 +135,6 @@ exports.products_delete = async (req, res, next) => {
       }
     })
   } catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err.message })
   }
 }

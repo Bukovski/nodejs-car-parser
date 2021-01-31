@@ -1,3 +1,5 @@
+const sharp = require('sharp');
+
 const User = require("../models/user-model");
 
 
@@ -24,7 +26,7 @@ exports.user_signup = async (req, res, next) => {
         res.status(500).json({ error: err });
       });
   } catch (err) {
-    res.status(500).json({ error: err });
+    res.status(500).json({ error: err.message })
   }
 };
 
@@ -54,39 +56,41 @@ exports.user_update_data = async (req, res, next) => {
   if (req.body.email && _auth.email !== req.body.email) return res.status(400).send({ message: "You can't change data of this user" });
   
   try {
-    const _user = await User.findByIdAndUpdate(_auth._id, req.body, { new: true, runValidators: true })
-  
-    const _token = await _user.generateAuthToken();
+    updates.forEach((update) => _auth[ update ] = req.body[ update ])
+    
+    await _auth.save();
+    
+    const _token = await _auth.generateAuthToken();
     
     const response = {
       message: "User data updated",
       token: _token,
       request: {
         type: "GET",
-        url: "http://localhost:3000/user/" + _user._id
+        url: "http://localhost:3000/user/" + _auth._id
       }
     };
     
     res.status(200).json(response);
   } catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err.message })
   }
 }
 
 exports.user_get_user = async (req, res, next) => {
-  const _auth = req.authUserInfo;
+  const _userId = req.params.userId;
+  const _user = await User.findById(_userId)
   
   try {
-    if (_auth._id !== req.params.userId) return res.status(400).send({ message: "You don't have access rules" });
-    
     const response = {
-      name: _auth.name,
-      email: _auth.email,
+      name: _user.name,
+      email: _user.email,
+      avatar: _user.avatar,
     }
     
     res.status(200).json({ user: response });
   } catch (err) {
-    res.status(500).json({ error: err });
+    res.status(500).json({ error: err.message })
   }
 };
 
@@ -96,7 +100,66 @@ exports.user_delete_user = async (req, res, next) => {
     
     res.status(200).json({ message: "User deleted" });
   } catch (err) {
-    res.status(500).json({ error: err });
+    res.status(500).json({ error: err.message })
   }
 };
 
+
+/************************************************/
+
+exports.user_load_avatar = async (req, res) => {
+  try {
+    const bufferImg = await sharp(req.file.buffer)
+      .resize({ width: 150, height: 150 }) // change image size
+      .png() // convert format
+      .toBuffer();
+    
+    req.authUserInfo.avatar = bufferImg; // save the thumbnail image as a bit code in the database
+    
+    await req.authUserInfo.save()
+    
+    const response = {
+      message: "Avatar image updated",
+      request: {
+        type: "GET",
+        url: "http://localhost:3000/user/avatar/" + req.authUserInfo._id
+      }
+    };
+    
+    res.status(200).json(response);
+    
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+};
+
+exports.user_delete_avatar = async (req, res) => {
+  req.authUserInfo.avatar = undefined
+  
+  await req.authUserInfo.save()
+  
+  const response = {
+    message: "Avatar image deleted",
+    request: {
+      type: "GET",
+      url: "http://localhost:3000/user/avatar/" + req.authUserInfo._id
+    }
+  };
+  
+  res.status(200).json(response);
+};
+
+exports.user_get_avatar = async (req, res) => {
+  try {
+    const _user = await User.findById(req.params.id);
+    
+    if (_user && !_user.avatar) {
+      return res.status(400).send({ message: "You don't have avatar image" });
+    }
+    
+    res.set('Content-Type', 'image/png') // encoding for output (video in the form of a code from the buffer)
+    res.send(_user.avatar)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+};

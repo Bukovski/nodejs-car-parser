@@ -30,6 +30,7 @@ Runs the app in the development mode. Open http://localhost:3000 to view it in t
 * [multer](https://github.com/expressjs/multer) - middleware for handling `multipart/form-data`, which is primarily used for `uploading files`
 * [nodemon](https://nodemon.io/) - monitor for any changes in your source and automatically restart your server
 * [request](https://github.com/request/request) - to make http calls. It supports HTTPS and follows redirects by default (Used for parsing).
+* [sharp](https://github.com/lovell/sharp) - convert large images in common formats to smaller, web-friendly JPEG, PNG, WebP and AVIF images of varying dimensions.
 
 
 ## Routes

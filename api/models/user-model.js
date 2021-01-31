@@ -22,6 +22,9 @@ const userSchema = mongoose.Schema({
         required: true,
         minlength: 7,
         trim: true,
+    },
+    avatar: {
+        type: Buffer // store the photo as byte code
     }
 }, {
     timestamps: true

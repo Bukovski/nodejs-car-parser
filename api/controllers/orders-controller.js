@@ -29,7 +29,7 @@ exports.orders_get_all = async (req, res) => {
       orders: _order.map(orderMapFn)
     })
   } catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err.message })
   }
 };
 
@@ -62,7 +62,7 @@ exports.orders_create_order = async (req, res, next) => {
     
     res.status(201).json(response);
   } catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err.message })
   }
 };
 
@@ -85,7 +85,7 @@ exports.orders_get_order = async (req, res, next) => {
     
     res.status(200).json(response);
   } catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err.message })
   }
 };
 
@@ -109,6 +109,6 @@ exports.orders_delete_order = async (req, res, next) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ error: err.message })
   }
 };
