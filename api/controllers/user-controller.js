@@ -55,9 +55,12 @@ exports.user_update_data = async (req, res, next) => {
   
   try {
     const _user = await User.findByIdAndUpdate(_auth._id, req.body, { new: true, runValidators: true })
+  
+    const _token = await _user.generateAuthToken();
     
     const response = {
       message: "User data updated",
+      token: _token,
       request: {
         type: "GET",
         url: "http://localhost:3000/user/" + _user._id
@@ -70,7 +73,24 @@ exports.user_update_data = async (req, res, next) => {
   }
 }
 
-exports.user_delete = async (req, res, next) => {
+exports.user_get_user = async (req, res, next) => {
+  const _auth = req.authUserInfo;
+  
+  try {
+    if (_auth._id !== req.params.userId) return res.status(400).send({ message: "You don't have access rules" });
+    
+    const response = {
+      name: _auth.name,
+      email: _auth.email,
+    }
+    
+    res.status(200).json({ user: response });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+};
+
+exports.user_delete_user = async (req, res, next) => {
   try {
     await User.remove({ _id: req.params.userId });
     
