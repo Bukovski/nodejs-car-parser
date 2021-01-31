@@ -1,3 +1,4 @@
+const fs = require('fs');
 const mongoose = require("mongoose");
 const Product = require("../models/product-model");
 
@@ -93,11 +94,11 @@ exports.products_update_product = async (req, res, next) => {
   
   if (!isValidOperation) return res.status(400).send({ error: 'Invalid fields for updates!' })
   
-  if (req.file && req.file.path) { // check file update
-    req.body.productImage = req.file.path;
-  }
-  
   try {
+    if (req.file && req.file.path) { // check file update
+      req.body.productImage = req.file.path;
+    }
+    
     const product = await Product.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
     if (!product) return res.status(404).json({ error: "Product Id not found" });
     
@@ -122,6 +123,10 @@ exports.products_delete = async (req, res, next) => {
     const product = await Product.findByIdAndDelete(_id)
     
     if (!product) return res.status(404).json({ error: "Product Id not found" });
+    
+    // remove page file
+    const filePath = product.productImage;
+    fs.unlinkSync(__dirname + "/../../" + filePath);
     
     res.status(200).json({
       message: "Product deleted",
