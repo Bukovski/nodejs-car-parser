@@ -1,12 +1,20 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/user-model')
 
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
     try {
         const token = req.headers.authorization.split(" ")[ 1 ]; // Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV...
         const decoded = jwt.verify(token, process.env.JWT_KEY); // check token
         
-        req.userData = decoded;
+        const user = await User.findOne({ _id: decoded._id })
+    
+        if (!user) {
+            return res.status(401).json({ message: 'User not found' });
+        }
+    
+        req.token = token
+        req.authUserInfo = decoded
         
         next();
     } catch (error) { // if token is not real or its lifetime (1 hour) has expired

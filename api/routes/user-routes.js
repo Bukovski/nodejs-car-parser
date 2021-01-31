@@ -20,6 +20,11 @@ router.post("/signup", UserController.user_signup);
  */
 router.post("/login", UserController.user_login);
 
+/**
+ * @request { "email": "some@mail.com" | "password": "testpass11" | "name": "Jon" }
+ */
+router.patch('/', checkAuth, UserController.user_update_data)
+
 router.delete("/:userId", checkAuth, UserController.user_delete);
 
 
